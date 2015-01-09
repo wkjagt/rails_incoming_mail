@@ -30,4 +30,28 @@ class RailsIncomingMailResponderTest < Minitest::Unit::TestCase
     @r.process_line("RCPT TO:<two@email.com>")
     assert_equal 2, Thread.current[:message][:to].length
   end
+
+  def test_should_go_in_data_mode_after_data_line
+    assert_equal false, Thread.current[:data_mode]
+    @r.process_line("DATA")
+    assert_equal true, Thread.current[:data_mode]
+  end
+
+  def test_should_process_all_lines_as_data_when_in_data_mode
+    @r.process_line("DATA")
+    @r.process_line("Header:value\r\n")
+    assert_equal "Header:value\r\n", @r.message[:data]
+    @r.process_line("Header2:value2\r\n")
+    assert_equal "Header:value\r\nHeader2:value2\r\n", @r.message[:data]
+  end
+
+  def test_should_quit_data_mode_when_line_is_period
+    @r.process_line("DATA")
+    @r.process_line("Header:value\r\n")
+    @r.process_line("\r\n")
+    @r.process_line("body\r\n")
+    assert_equal true, @r.data_mode?
+    @r.process_line(".")
+    assert_equal false, @r.data_mode?
+  end
 end
