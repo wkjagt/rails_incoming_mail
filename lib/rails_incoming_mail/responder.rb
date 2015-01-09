@@ -30,8 +30,12 @@ module RailsIncomingMail
 
     private
 
+      def line(data)
+        "#{data}\r\n"
+      end
+
       def process_ehlo_line
-        "250 #{@my_domain}\r\n"
+        line "250 #{@my_domain}"
       end
 
       def process_quit_line
@@ -41,17 +45,17 @@ module RailsIncomingMail
 
       def process_mail_from_line(line)
         Thread.current[:message][:from] = line.gsub(/^MAIL FROM\:/, '').strip
-        "250 Ok\r\n"
+        line "250 Ok"
       end
 
       def process_rcpt_to_line(line)
         Thread.current[:message][:to] << line.gsub(/^RCPT TO\:/, '').strip
-        "250 Ok\r\n"
+        line "250 Ok"
       end
 
       def process_data_line
         Thread.current[:data_mode] = true
-        "354 Enter message, ending with \".\" on a line by itself\r\n"
+        line "354 Enter message, ending with \".\" on a line by itself"
       end
 
       def process_data(line)
@@ -65,7 +69,7 @@ module RailsIncomingMail
           # Thread.current[:message][:data].gsub!(/\r\n\Z/, '').gsub!(/\.\Z/, '')
           # new_message_event(Thread.current[:message])
           # reset_message
-          return "250 OK\r\n"
+          return line "250 Ok"
         end
         
         # If we are in date mode then we need to add
@@ -76,7 +80,7 @@ module RailsIncomingMail
         else
           # If we somehow get to this point then
           # we have encountered an error
-          return "500 ERROR\r\n"
+          return line "500 ERROR"
         end
       end
   end
