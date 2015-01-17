@@ -12,6 +12,8 @@ module RailsIncomingMail
     def serve(io)
       setup_transaction(io)
       receive(io)
+    rescue ProtocolError
+      io.print "500 ERROR\r\n"
     rescue Quit
     ensure
       reset_transaction(io)
