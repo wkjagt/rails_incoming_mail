@@ -6,4 +6,12 @@ Rake::TestTask.new do |t|
 end
 
 desc "Run tests"
-task :default => :test
+task default: :test
+
+desc "Run example"
+task :example do
+  require 'rails_incoming_mail'
+  server = RailsIncomingMail::Server.new('willemtest.ngrok.com', 25)
+  server.start
+  server.join
+end

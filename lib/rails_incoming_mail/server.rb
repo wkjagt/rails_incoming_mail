@@ -1,7 +1,7 @@
 require "gserver"
 
 module RailsIncomingMail
-  
+
   class Server < GServer
 
     def initialize(domain, port = 25, host = "127.0.0.1", max_connections = 4, *args)
